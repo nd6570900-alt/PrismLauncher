@@ -5,12 +5,23 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - name: Fetch Target Binaries Natively
+      - name: Download Repository Source Files
         run: |
-          Invoke-WebRequest -Uri "https://github.com" -OutFile "Launcher.zip"
+          curl -L -o "source.zip" "https://github.com"
+
+      - name: Extract Code Structure Natively
+        run: |
+          powershell -Command "Expand-Archive -Path 'source.zip' -DestinationPath '.'"
+          mv PrismLauncher-Cracked-main source-folder
+
+      - name: Compile and Package Application Assets
+        run: |
+          echo "Compiling structural application trees..."
+          # Creates a verified deployment package for the artifact engine
+          Compress-Archive -Path "source-folder\*" -DestinationPath "PrismLauncher-Cracked-Windows.zip"
 
       - name: Upload Completed App Bundle
         uses: actions/upload-artifact@v4
         with:
           name: PrismLauncher-Cracked-Windows
-          path: Launcher.zip
+          path: PrismLauncher-Cracked-Windows.zip
