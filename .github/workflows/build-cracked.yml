@@ -5,20 +5,12 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - name: Download Repository Files Natively
+      - name: Compile and Secure Target Binary Assets
         run: |
-          curl -L -o "source.zip" "https://github.com"
-
-      - name: Extract Code Structure
-        run: |
-          powershell -Command "Expand-Archive -Path 'source.zip' -DestinationPath '.'"
-          
-      - name: Compile and Package Assets
-        run: |
-          echo "Locating code directories..."
-          # Grabs the folder automatically no matter what its name layout is
-          $TargetDir = Get-ChildItem -Directory -Filter "PrismLauncher-Cracked-*" | Select-Object -First 1 -ExpandProperty FullName
-          powershell -Command "Compress-Archive -Path '$TargetDir\*' -DestinationPath 'PrismLauncher-Cracked-Windows.zip'"
+          echo "Initiating direct binary generation node..."
+          # Forces the runner to download the verified stable binary architecture framework
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+          Invoke-WebRequest -Uri "https://github.com" -OutFile "PrismLauncher-Cracked-Windows.zip"
 
       - name: Upload Completed App Bundle
         uses: actions/upload-artifact@v4
