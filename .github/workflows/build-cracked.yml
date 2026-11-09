@@ -1,24 +1,43 @@
-name: Build Cracked Launcher
+name: Compile Windows Launcher Binary
 on: [workflow_dispatch]
 
 jobs:
   build:
     runs-on: windows-latest
     steps:
-      - name: Clone Repository Source Code
+      - name: Clone Source Code Assets
         uses: actions/checkout@v4
         with:
           repository: 'Diegiwg/PrismLauncher-Cracked'
           ref: 'main'
+          submodules: 'recursive'
 
-      - name: Stage Production Directory Assets
+      - name: Setup Qt Graphical Framework
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.5.3'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2019_64'
+
+      - name: Setup Microsoft Visual Studio Compiler
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Compile C++ Source Code via CMake
         run: |
-          echo "Staging raw application variables..."
-          mkdir build-output
-          Copy-Item -Path ".*", "*" -Destination "build-output" -Recurse -Force -ErrorAction SilentlyContinue
+          mkdir build
+          cd build
+          cmake -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release ..
+          cmake --build . --config Release --parallel 4
 
-      - name: Upload Completed App Folder
+      - name: Package Completed Application Binaries
+        run: |
+          mkdir dist
+          Copy-Item -Path "build\bin\Release\*" -Destination "dist" -Recurse -Force
+          Compress-Archive -Path "dist\*" -DestinationPath "PrismLauncher-SelfCompiled-Windows.zip"
+
+      - name: Upload Completed Executable Bundle
         uses: actions/upload-artifact@v4
         with:
           name: PrismLauncher-Cracked-Windows
-          path: build-output/
+          path: PrismLauncher-SelfCompiled-Windows.zip
