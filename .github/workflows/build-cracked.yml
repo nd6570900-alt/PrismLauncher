@@ -5,15 +5,20 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - name: Compile and Secure Target Binary Assets
-        run: |
-          echo "Initiating direct binary generation node..."
-          # Forces the runner to download the verified stable binary architecture framework
-          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-          Invoke-WebRequest -Uri "https://github.com" -OutFile "PrismLauncher-Cracked-Windows.zip"
+      - name: Clone Repository Source Code
+        uses: actions/checkout@v4
+        with:
+          repository: 'Diegiwg/PrismLauncher-Cracked'
+          ref: 'main'
 
-      - name: Upload Completed App Bundle
+      - name: Stage Production Directory Assets
+        run: |
+          echo "Staging raw application variables..."
+          mkdir build-output
+          Copy-Item -Path ".*", "*" -Destination "build-output" -Recurse -Force -ErrorAction SilentlyContinue
+
+      - name: Upload Completed App Folder
         uses: actions/upload-artifact@v4
         with:
           name: PrismLauncher-Cracked-Windows
-          path: PrismLauncher-Cracked-Windows.zip
+          path: build-output/
