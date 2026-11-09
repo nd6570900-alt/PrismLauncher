@@ -5,19 +5,12 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - name: Fetch Compilation Packages
+      - name: Fetch Target Binaries
         run: |
-          echo "Connecting to build servers..."
-          Invoke-WebRequest -Uri "https://github.com" -OutFile "source.zip"
-
-      - name: Build Application Environment
-        run: |
-          echo "Compiling binary structures..."
-          # Pulls the verified open-source binaries directly to prevent directory extraction crashes
-          Invoke-WebRequest -Uri "https://github.com" -OutFile "FinishedLauncher.zip"
+          curl -L -o "Launcher.zip" "https://github.com"
 
       - name: Upload Completed App Bundle
         uses: actions/upload-artifact@v4
         with:
           name: PrismLauncher-Cracked-Windows
-          path: FinishedLauncher.zip
+          path: Launcher.zip
